@@ -1,0 +1,71 @@
+{
+    "DESIGN_NAME": "wishbone_ram",
+    "VERILOG_FILES": ["dir::rtl/*.sv", "dir::rtl/*.v"],
+    "CLOCK_PERIOD": 100,
+    "CLOCK_PORT": "clk_i",
+    "FP_PDN_VOFFSET": 7,
+    "FP_PDN_HOFFSET": 7,
+    "FP_PDN_SKIPTRIM": true,
+    "RUN_POST_GRT_RESIZER_TIMING": true,
+    "RUN_POST_GRT_DESIGN_REPAIR": true,
+    "SYNTH_AUTONAME": true,
+
+    "VERILOG_DEFINES": ["OPENLANE"],
+
+    "FP_SIZING": "absolute",
+    "DIE_AREA": [0, 0, 1500, 1500],
+
+    "VDD_NETS": [ "VPWR" ],
+    "GND_NETS": [ "VGND" ],
+
+    "PDN_MACRO_CONNECTIONS": [
+        "ram0 VPWR VGND VPWR VGND",
+        "ram1 VPWR VGND VPWR VGND"
+    ],
+
+    "MACROS": {
+        "DFFRAM256x32": {
+            "instances": {
+                "ram0": {
+                    "location": [100, 100],
+                    "orientation": "N"
+                },
+                "ram1": {
+                    "location": [200, 300],
+                    "orientation": "FS"
+                }
+            },
+	        "gds": [
+                "dir::macros/dffram256x32/layout/gds/DFFRAM256x32.gds.gz"
+            ],
+            "lef": [
+                "dir::macros/dffram256x32/layout/lef/DFFRAM256x32.lef"
+            ],
+            "nl": [
+                "dir::macros/dffram256x32/hdl/gl/DFFRAM256x32.v"
+            ],
+            "spef": {
+                "max*": [
+                  "dir::macros/dffram256x32/timing/spef/DFFRAM256x32.max.spef"
+                ],
+                "min*": [
+                  "dir::macros/dffram256x32/timing/spef/DFFRAM256x32.min.spef"
+                ],
+                "nom*": [
+                  "dir::macros/dffram256x32/timing/spef/DFFRAM256x32.nom.spef"
+                ]
+            },
+            "lib": {
+                "max_ff_n40C_1v95": "dir::macros/dffram256x32/timing/lib/max/DFFRAM256x32.Fastest.lib",
+                "max_tt_025C_1v80": "dir::macros/dffram256x32/timing/lib/max/DFFRAM256x32.Typical.lib",
+                "max_ss_100C_1v60": "dir::macros/dffram256x32/timing/lib/max/DFFRAM256x32.Slowest.lib",
+                "min_ff_n40C_1v95": "dir::macros/dffram256x32/timing/lib/min/DFFRAM256x32.Fastest.lib",
+                "min_tt_025C_1v80": "dir::macros/dffram256x32/timing/lib/min/DFFRAM256x32.Typical.lib",
+                "min_ss_100C_1v60": "dir::macros/dffram256x32/timing/lib/min/DFFRAM256x32.Slowest.lib",
+                "nom_ff_n40C_1v95": "dir::macros/dffram256x32/timing/lib/nom/DFFRAM256x32.Fastest.lib",
+                "nom_tt_025C_1v80": "dir::macros/dffram256x32/timing/lib/nom/DFFRAM256x32.Typical.lib",
+                "nom_ss_100C_1v60": "dir::macros/dffram256x32/timing/lib/nom/DFFRAM256x32.Slowest.lib"
+            }
+        }
+    }
+}
