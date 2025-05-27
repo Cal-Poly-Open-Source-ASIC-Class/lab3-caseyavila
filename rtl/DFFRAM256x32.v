@@ -40,7 +40,6 @@ module DFFRAM256x32  (
        output  reg     [31:0]               Do0;
        input   wire    [(A_WIDTH - 1): 0]   A0;
        
-`ifndef OPENLANE
        reg [31:0] RAM[(NUM_WORDS-1): 0];
 
        always @(posedge CLK)
@@ -53,6 +52,5 @@ module DFFRAM256x32  (
            end
            else
                Do0 <= 32'b0;
-`endif
 
 endmodule

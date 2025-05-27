@@ -2,10 +2,10 @@
 
 module wishbone_ram
     (input clk_i,
-      `ifdef USE_POWER_PINS
-      input VPWR,
-      input VGND,
-      `endif
+     `ifdef USE_POWER_PINS
+     input VPWR,
+     input VGND,
+     `endif
      input rst_n_i,
      input pA_wb_cyc_i, pB_wb_cyc_i,
      input pA_wb_stb_i, pB_wb_stb_i,
@@ -48,11 +48,13 @@ module wishbone_ram
     );
 
     logic contention;
-    logic stall_a;
-    logic stall_b;
+    logic turn;
     logic [1:0] read_a;
     logic [1:0] read_b;
-    logic turn;
+    logic [1:0] buf_read_a;
+    logic [1:0] buf_read_b;
+    logic stall_a;
+    logic stall_b;
 
     assign contention = pA_wb_stb_i & pB_wb_stb_i & (pA_wb_addr_i[8] == pB_wb_addr_i[8]);
 
@@ -66,60 +68,64 @@ module wishbone_ram
         end
     end
 
-    `define send(we, data_i, a, read) \
-        if (a[8] == 0) begin \
-            we0 <= we; \
-            di0 <= data_i; \
-            a0 <= a[7:0]; \
-            read <= 2'b01; \
-        end else begin \
-            we1 <= we; \
-            di1 <= data_i; \
-            a1 <= a[7:0]; \
-            read <= 2'b10; \
-        end
-
-    `define recv(ack, read, data_o) \
-        ack <= 1; \
-        read <= 2'b0; \
-        if (read == 2'b01) begin \
-            data_o <= do0; \
-        end else begin \
-            data_o <= do1; \
-        end
-
-    always @ (negedge clk_i) begin
-        if (~rst_n_i) begin
-            read_a <= 2'b0;
-            read_b <= 2'b0;
-            turn <= 0;
-        end
-
-        if (contention) begin
-            turn <= ~turn;
-        end
-
-        if (read_a != 2'b0) begin
-            `recv(pA_wb_ack_o, read_a, pA_wb_data_o);
-        end else begin
-            pA_wb_ack_o <= 0;
-        end
-
-        if (read_b != 2'b0) begin
-            `recv(pB_wb_ack_o, read_b, pB_wb_data_o);
-        end else begin
-            pB_wb_ack_o <= 0;
-        end
+    always_comb begin
+        we0 = 0;
+        a0 = 0;
+        di0 = 0;
+        we1 = 0;
+        a1 = 0;
+        di1 = 0;
+        read_a = 0;
+        read_b = 0;
 
         if (pA_wb_cyc_i & pA_wb_stb_i & ~stall_a) begin
-            `send(pA_wb_we_i, pA_wb_data_i, pA_wb_addr_i, read_a);
+            if (pA_wb_addr_i[8] == 0) begin
+                we0 = pA_wb_we_i;
+                a0 = pA_wb_addr_i[7:0];
+                di0 = pA_wb_data_i;
+                read_a = 2'b01;
+            end else begin
+                we1 = pA_wb_we_i;
+                a1 = pA_wb_addr_i[7:0];
+                di1 = pA_wb_data_i;
+                read_a = 2'b10;
+            end
         end
+
         if (pB_wb_cyc_i & pB_wb_stb_i & ~stall_b) begin
-            `send(pB_wb_we_i, pB_wb_data_i, pB_wb_addr_i, read_b);
+            if (pB_wb_addr_i[8] == 0) begin
+                we0 = pB_wb_we_i;
+                a0 = pB_wb_addr_i[7:0];
+                di0 = pB_wb_data_i;
+                read_b = 2'b01;
+            end else begin
+                we1 = pB_wb_we_i;
+                a1 = pB_wb_addr_i[7:0];
+                di1 = pB_wb_data_i;
+                read_b = 2'b10;
+            end
         end
+    end
 
-        pA_wb_stall_o <= stall_a;
-        pB_wb_stall_o <= stall_b;
+    always @ (posedge clk_i) begin
+        if (~rst_n_i) begin
+            turn <= 0;
+        end else begin
+            if (contention) begin
+                turn <= ~turn;
+            end
 
+            buf_read_a <= read_a;
+            pA_wb_ack_o <= buf_read_a != 2'b0;
+            if (buf_read_a == 2'b01) pA_wb_data_o <= do0;
+            if (buf_read_a == 2'b10) pA_wb_data_o <= do1;
+            pA_wb_stall_o <= stall_a;
+
+            buf_read_b <= read_b;
+            pB_wb_ack_o <= buf_read_b != 2'b0;
+            if (buf_read_b == 2'b01) pB_wb_data_o <= do0;
+            if (buf_read_b == 2'b10) pB_wb_data_o <= do1;
+            pB_wb_stall_o <= stall_b;
+        end
     end
 endmodule

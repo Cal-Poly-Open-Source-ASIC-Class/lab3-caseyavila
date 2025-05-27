@@ -1,0 +1,77 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Tue May 27 04:22:14 2025
+[*]
+[dumpfile] "/home/asic/workspace/lab3-caseyavila/tests/tb_wishbone_ram/tb_wishbone_ram.vcd"
+[dumpfile_mtime] "Tue May 27 04:19:53 2025"
+[dumpfile_size] 20030
+[savefile] "/home/asic/workspace/lab3-caseyavila/waveform.gtkw"
+[timestart] 0
+[size] 1904 1039
+[pos] -1 -1
+*-15.000000 22900 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[markername] AA
+[markername] BB
+[markername] CC
+[markername] DD
+[markername] EE
+[markername] FF
+[markername] GG
+[markername] HH
+[markername] II
+[markername] JJ
+[markername] KK
+[markername] LL
+[markername] MM
+[markername] NN
+[markername] OO
+[markername] PP
+[markername] QQ
+[markername] RR
+[markername] SS
+[markername] TT
+[markername] UU
+[markername] VV
+[markername] WW
+[markername] XX
+[markername] YY
+[markername] ZZ
+[treeopen] tb_wishbone_ram.
+[treeopen] tb_wishbone_ram.wb.
+[sst_width] 276
+[signals_width] 174
+[sst_expanded] 1
+[sst_vpaned_height] 303
+@28
+tb_wishbone_ram.clk_i
+tb_wishbone_ram.rst_n_i
+@200
+-
+@28
+tb_wishbone_ram.pA_wb_cyc_i
+tb_wishbone_ram.pA_wb_stb_i
+@22
+tb_wishbone_ram.pA_wb_addr_i[8:0]
+tb_wishbone_ram.pA_wb_we_i[3:0]
+tb_wishbone_ram.pA_wb_data_i[31:0]
+@28
+tb_wishbone_ram.pA_wb_stall_o
+tb_wishbone_ram.pA_wb_ack_o
+@22
+tb_wishbone_ram.pA_wb_data_o[31:0]
+@200
+-
+@28
+tb_wishbone_ram.pB_wb_cyc_i
+tb_wishbone_ram.pB_wb_stb_i
+@22
+tb_wishbone_ram.pB_wb_addr_i[8:0]
+tb_wishbone_ram.pB_wb_we_i[3:0]
+tb_wishbone_ram.pB_wb_data_i[31:0]
+@28
+tb_wishbone_ram.pB_wb_stall_o
+tb_wishbone_ram.pB_wb_ack_o
+@23
+tb_wishbone_ram.pB_wb_data_o[31:0]
+[pattern_trace] 1
+[pattern_trace] 0

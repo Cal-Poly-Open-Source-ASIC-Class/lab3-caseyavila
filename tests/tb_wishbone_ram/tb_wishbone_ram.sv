@@ -14,6 +14,14 @@ logic [31:0] pA_wb_data_o, pB_wb_data_o;
 logic pA_wb_ack_o, pB_wb_ack_o;
 logic pA_wb_stall_o, pB_wb_stall_o;
 
+`ifdef USE_POWER_PINS
+    wire VPWR;
+    wire VGND;
+    assign VPWR=1;
+    assign VGND=0;
+`endif
+
+
 // Instantiate Design 
 wishbone_ram wb (.*);
 
@@ -28,18 +36,17 @@ end
 initial begin
     // Name as needed
     $dumpfile("tb_wishbone_ram.vcd");
-    $dumpvars(0);
+    $dumpvars(2, tb_wishbone_ram);
 end
 
 initial begin
     // Test Goes Here
-    clk_i = 0;
-    rst_n_i = 1;
-
-    #10;
+    clk_i = 1;
     rst_n_i = 0;
 
-    #10;
+    #20;
+    rst_n_i = 1;
+
     pA_wb_cyc_i = 1;
     pA_wb_stb_i = 1;
     pA_wb_addr_i = 0;
@@ -52,15 +59,19 @@ initial begin
     pB_wb_we_i = 4'b1111;
     pB_wb_data_i = 32'hdddd;
 
+    //#20;
+    //pA_wb_cyc_i = 0;
+    //pA_wb_stb_i = 0;
+
     #60;
-    pB_wb_addr_i = 9'b000000001;
+    pB_wb_addr_i = 9'b100000001;
     pB_wb_we_i = 4'b0000;
 
     //#10;
     //pB_wb_cyc_i = 0;
     //pB_wb_stb_i = 0;
 
-    #1000;
+    #500;
 
     // Make sure to call finish so test exits
     $finish();
