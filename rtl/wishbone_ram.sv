@@ -78,7 +78,7 @@ module wishbone_ram
         read_a = 0;
         read_b = 0;
 
-        if (pA_wb_cyc_i & pA_wb_stb_i & ~stall_a) begin
+        if (pA_wb_cyc_i & pA_wb_stb_i & ~pA_wb_stall_o) begin
             if (pA_wb_addr_i[8] == 0) begin
                 we0 = pA_wb_we_i;
                 a0 = pA_wb_addr_i[7:0];
@@ -92,7 +92,7 @@ module wishbone_ram
             end
         end
 
-        if (pB_wb_cyc_i & pB_wb_stb_i & ~stall_b) begin
+        if (pB_wb_cyc_i & pB_wb_stb_i & ~pB_wb_stall_o) begin
             if (pB_wb_addr_i[8] == 0) begin
                 we0 = pB_wb_we_i;
                 a0 = pB_wb_addr_i[7:0];
@@ -107,6 +107,13 @@ module wishbone_ram
         end
     end
 
+    always_latch begin
+        if (buf_read_a == 2'b01) pA_wb_data_o = do0;
+        if (buf_read_a == 2'b10) pA_wb_data_o = do1;
+        if (buf_read_b == 2'b01) pB_wb_data_o = do0;
+        if (buf_read_b == 2'b10) pB_wb_data_o = do1;
+    end
+
     always @ (posedge clk_i) begin
         if (~rst_n_i) begin
             turn <= 0;
@@ -116,15 +123,11 @@ module wishbone_ram
             end
 
             buf_read_a <= read_a;
-            pA_wb_ack_o <= buf_read_a != 2'b0;
-            if (buf_read_a == 2'b01) pA_wb_data_o <= do0;
-            if (buf_read_a == 2'b10) pA_wb_data_o <= do1;
+            pA_wb_ack_o <= read_a != 2'b0;
             pA_wb_stall_o <= stall_a;
 
             buf_read_b <= read_b;
-            pB_wb_ack_o <= buf_read_b != 2'b0;
-            if (buf_read_b == 2'b01) pB_wb_data_o <= do0;
-            if (buf_read_b == 2'b10) pB_wb_data_o <= do1;
+            pB_wb_ack_o <= read_b != 2'b0;
             pB_wb_stall_o <= stall_b;
         end
     end

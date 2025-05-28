@@ -1,7 +1,7 @@
 {
     "DESIGN_NAME": "wishbone_ram",
     "VERILOG_FILES": ["dir::rtl/*.sv", "dir::rtl/*.v"],
-    "CLOCK_PERIOD": 26,
+    "CLOCK_PERIOD": 30,
     "CLOCK_PORT": "clk_i",
     "FP_PDN_SKIPTRIM": true,
     "RUN_POST_GRT_RESIZER_TIMING": true,
