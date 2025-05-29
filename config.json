@@ -8,7 +8,7 @@
     "SYNTH_AUTONAME": true,
 
     "FP_SIZING": "absolute",
-    "DIE_AREA": [0, 0, 1700, 1700],
+    "DIE_AREA": [0, 0, 1450, 1450],
 
     "VDD_NETS": [ "VPWR" ],
     "GND_NETS": [ "VGND" ],
