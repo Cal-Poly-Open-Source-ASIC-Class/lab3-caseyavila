@@ -49,86 +49,63 @@ module wishbone_ram
 
     logic contention;
     logic turn;
-    logic [1:0] read_a;
-    logic [1:0] read_b;
-    logic [1:0] buf_read_a;
-    logic [1:0] buf_read_b;
-    logic stall_a;
-    logic stall_b;
+    logic read_a;
+    logic read_b;
+    logic sel_a;
+    logic sel_b;
 
     assign contention = pA_wb_stb_i & pB_wb_stb_i & (pA_wb_addr_i[8] == pB_wb_addr_i[8]);
+    assign pA_wb_data_o = sel_a ? do1 : do0;
+    assign pB_wb_data_o = sel_b ? do1 : do0;
 
-    always_comb begin
-        if (contention) begin
-            stall_a = turn;
-            stall_b = ~turn;
-        end else begin
-            stall_a = 0;
-            stall_b = 0;
-        end
-    end
-
-    always_comb begin
-        we0 = 0;
-        a0 = 0;
-        di0 = 0;
-        we1 = 0;
-        a1 = 0;
-        di1 = 0;
-        read_a = 0;
-        read_b = 0;
-
-        if (pA_wb_cyc_i & pA_wb_stb_i & ~pA_wb_stall_o) begin
-            if (pA_wb_addr_i[8] == 0) begin
-                we0 = pA_wb_we_i;
-                a0 = pA_wb_addr_i[7:0];
-                di0 = pA_wb_data_i;
-                read_a = 2'b01;
-            end else begin
-                we1 = pA_wb_we_i;
-                a1 = pA_wb_addr_i[7:0];
-                di1 = pA_wb_data_i;
-                read_a = 2'b10;
-            end
-        end
-
-        if (pB_wb_cyc_i & pB_wb_stb_i & ~pB_wb_stall_o) begin
-            if (pB_wb_addr_i[8] == 0) begin
-                we0 = pB_wb_we_i;
-                a0 = pB_wb_addr_i[7:0];
-                di0 = pB_wb_data_i;
-                read_b = 2'b01;
-            end else begin
-                we1 = pB_wb_we_i;
-                a1 = pB_wb_addr_i[7:0];
-                di1 = pB_wb_data_i;
-                read_b = 2'b10;
-            end
-        end
-    end
-
-    always_latch begin
-        if (buf_read_a == 2'b01) pA_wb_data_o = do0;
-        if (buf_read_a == 2'b10) pA_wb_data_o = do1;
-        if (buf_read_b == 2'b01) pB_wb_data_o = do0;
-        if (buf_read_b == 2'b10) pB_wb_data_o = do1;
-    end
-
-    always @ (posedge clk_i) begin
+    always @(posedge clk_i) begin
         if (~rst_n_i) begin
             turn <= 0;
         end else begin
             if (contention) begin
                 turn <= ~turn;
+                pA_wb_stall_o = turn;
+                pB_wb_stall_o = ~turn;
+            end else begin
+                pA_wb_stall_o = 0;
+                pB_wb_stall_o = 0;
             end
 
-            buf_read_a <= read_a;
-            pA_wb_ack_o <= read_a != 2'b0;
-            pA_wb_stall_o <= stall_a;
+            we0 <= 0;
+            we1 <= 0;
 
-            buf_read_b <= read_b;
-            pB_wb_ack_o <= read_b != 2'b0;
-            pB_wb_stall_o <= stall_b;
+            read_a <= 0;
+            if (pA_wb_cyc_i & pA_wb_stb_i & ~pA_wb_stall_o) begin
+                read_a <= 1;
+                sel_a <= pA_wb_addr_i[8];
+                if (pA_wb_addr_i[8] == 0) begin
+                    we0 <= pA_wb_we_i;
+                    a0 <= pA_wb_addr_i[7:0];
+                    di0 <= pA_wb_data_i;
+                end else begin
+                    we1 <= pA_wb_we_i;
+                    a1 <= pA_wb_addr_i[7:0];
+                    di1 <= pA_wb_data_i;
+                end
+            end
+
+            read_b <= 0;
+            if (pB_wb_cyc_i & pB_wb_stb_i & ~pB_wb_stall_o) begin
+                read_b <= 1;
+                sel_b <= pB_wb_addr_i[8];
+                if (pB_wb_addr_i[8] == 0) begin
+                    we0 <= pB_wb_we_i;
+                    a0 <= pB_wb_addr_i[7:0];
+                    di0 <= pB_wb_data_i;
+                end else begin
+                    we1 <= pB_wb_we_i;
+                    a1 <= pB_wb_addr_i[7:0];
+                    di1 <= pB_wb_data_i;
+                end
+            end
+
+            pA_wb_ack_o <= read_a;
+            pB_wb_ack_o <= read_b;
         end
     end
 endmodule
